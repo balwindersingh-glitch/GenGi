@@ -1,1 +1,1 @@
-This is the GenGi project. Work in progress.
+# GenGi\n\nThis is the GenGi project. Work in progress.\n\n## Project Files\n- analyze_video.py\n- app.py\n- drive_upload.py\n- frontend\n- generate_image.py\n- generate_video.py\n- nano_banana.py\n- requirements.txt\n- run.sh\n- setup-gcs-permissions.sh
