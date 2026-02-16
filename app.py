@@ -586,8 +586,19 @@ FRONTEND = Path(__file__).parent / "frontend"
 INDEX_HTML = FRONTEND / "index.html"
 
 
-@app.get("/")
-def index():
+def _serve_index():
     if INDEX_HTML.is_file():
         return FileResponse(INDEX_HTML)
     return {"message": "Create frontend/index.html for the UI."}
+
+
+@app.get("/")
+def index():
+    return _serve_index()
+
+
+@app.get("/api")
+@app.get("/api/")
+def index_api():
+    """Served when Vercel rewrites / to /api/ so the api/index.py function can serve the UI."""
+    return _serve_index()
