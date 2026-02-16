@@ -1,0 +1,17 @@
+# GCP service account key - never commit
+gen-lang-client-*.json
+*-????????-????????????.json
+*automationproject*.json
+*.json
+
+# Python
+__pycache__/
+.venv/
+venv/
+.env
+*.pyc
+
+# Outputs & data
+veo_outputs/
+*.mp4
+history.json

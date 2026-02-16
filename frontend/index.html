@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --surface: #161618;
+      --surface-hover: #1c1c1f;
+      --border: #2a2a2e;
+      --text: #e4e4e7;
+      --muted: #71717a;
+      --accent: #a78bfa;
+      --accent-hover: #c4b5fd;
+      --success: #34d399;
+      --error: #f87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 1.5rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .navbar-brand {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .navbar-link {
+      padding: 0.5rem 0.875rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9375rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .navbar-link:hover { color: var(--text); background: var(--surface-hover); }
+    .navbar-link.active { color: var(--accent); background: rgba(167, 139, 250, 0.12); }
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .navbar-actions .btn-outline {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .navbar-actions .btn-outline:hover { border-color: var(--accent); background: var(--surface-hover); }
+    .navbar-actions .btn-primary-nav {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .navbar-actions .btn-primary-nav:hover { background: var(--accent-hover); }
+    .main {
+      flex: 1;
+      min-width: 0;
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 120px 2rem 2rem;
+      overflow-y: auto;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .panel h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+    .panel .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    label { display: block; font-size: 0.8125rem; font-weight: 500; color: var(--muted); margin-bottom: 0.375rem; }
+    textarea, input[type="text"], input[type="number"] {
+      width: 100%; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.9375rem; transition: border-color 0.15s;
+    }
+    input[type="number"] { max-width: 8rem; }
+    textarea { min-height: 110px; resize: vertical; }
+    textarea::placeholder, input::placeholder { color: var(--muted); }
+    textarea:focus, input:focus { outline: none; border-color: var(--accent); }
+    .row { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .field { flex: 1; min-width: 120px; }
+    select {
+      width: 100%; padding: 0.5rem 0.75rem; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-family: inherit; font-size: 0.875rem; cursor: pointer;
+    }
+    .checkbox-wrap { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+    .checkbox-wrap input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+    .btn { font-family: inherit; font-weight: 600; font-size: 0.9375rem; padding: 0.75rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; transition: background 0.15s; }
+    .btn-primary { background: var(--accent); color: var(--bg); margin-top: 1rem; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .toggle-adv { margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--muted); font-size: 0.875rem; }
+    .toggle-adv:hover { color: var(--accent); }
+    .toggle-adv.open svg { transform: rotate(180deg); }
+    .advanced { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .advanced.visible { display: block; }
+    .status { padding: 1rem 1.25rem; border-radius: 8px; font-size: 0.9rem; margin-top: 1rem; display: none; }
+    .status.visible { display: block; }
+    .status.generating { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: var(--accent); }
+    .status.done { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+    .status.failed { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+    .spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: -0.15em; margin-right: 0.5rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .video-wrap { margin-top: 1rem; border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 16/9; }
+    .video-wrap video { width: 100%; height: 100%; display: block; }
+    .video-actions { margin-top: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .video-actions a { font-size: 0.875rem; color: var(--accent); text-decoration: none; }
+    .video-actions a:hover { text-decoration: underline; }
+    .examples { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .example-chip {
+      padding: 0.4rem 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+      font-size: 0.8125rem; color: var(--muted); cursor: pointer; transition: border-color 0.15s, color 0.15s;
+    }
+    .example-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .prompt-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+    .label-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.375rem; }
+    .label-row label { margin-bottom: 0; flex: 1; }
+    .clear-prompt-btn {
+      font-size: 0.75rem; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); cursor: pointer; font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .clear-prompt-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .history-list { list-style: none; }
+    .history-item {
+      padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.875rem;
+    }
+    .history-item .prompt-text { margin-bottom: 0.35rem; }
+    .history-item .meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.35rem; }
+    .history-item .links a { margin-right: 0.75rem; color: var(--accent); text-decoration: none; }
+    .history-item.done .prompt-text { color: var(--text); }
+    .history-item.failed { border-color: rgba(248,113,113,0.4); }
+    .history-empty { color: var(--muted); font-size: 0.9rem; padding: 1rem 0; }
+    .config-badge { font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 1rem; }
+    .attach-previews { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .attach-previews .thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+    .attach-previews .wrap { position: relative; }
+    .attach-previews .remove { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--error); color: #fff; font-size: 12px; cursor: pointer; line-height: 1; padding: 0; }
+
+    .file-drop-zone {
+      position: relative;
+      margin-top: 0.5rem;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .file-drop-zone:hover {
+      border-color: var(--accent);
+      background: var(--surface-hover);
+    }
+    .file-drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(167, 139, 250, 0.08);
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+    }
+    .file-drop-zone .file-input-hidden {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .file-drop-zone-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      pointer-events: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .file-drop-zone .file-input-hidden:focus + .file-drop-zone-inner,
+    .file-drop-zone:hover .file-drop-zone-inner {
+      color: var(--accent);
+    }
+    .file-drop-zone-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .file-drop-zone:hover .file-drop-zone-icon {
+      border-color: var(--accent);
+      background: rgba(167, 139, 250, 0.12);
+    }
+    .file-drop-zone-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+    .file-drop-zone-text strong { color: var(--text); font-weight: 600; }
+    .file-drop-zone.drag-over .file-drop-zone-text { color: var(--accent); }
+    .file-drop-zone-single { min-height: 64px; }
+    .file-drop-zone-single .file-drop-zone-inner { padding: 0.75rem 1rem; }
+    .file-drop-zone-single .file-drop-zone-icon { width: 36px; height: 36px; }
+    .file-drop-zone-single .file-drop-zone-icon svg { width: 18px; height: 18px; }
+    .analyze-result { }
+    .analyze-segment {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+    }
+    .analyze-segment .segment-time { color: var(--accent); font-weight: 600; margin-bottom: 0.35rem; }
+    .analyze-segment .segment-desc { color: var(--muted); margin-bottom: 0.5rem; }
+    .analyze-segment .segment-singing { margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(167,139,250,0.08); border-radius: 6px; border-left: 3px solid var(--accent); font-size: 0.85rem; }
+    .analyze-segment .segment-singing strong { color: var(--accent); }
+    .analyze-segment .segment-sounds { margin-bottom: 0.5rem; padding: 0.5rem; background: var(--surface); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
+    .analyze-segment .segment-sounds strong { color: var(--text); }
+    .analyze-segment .segment-prompt { margin-bottom: 0.5rem; line-height: 1.45; }
+    .analyze-segment .copy-prompt-btn {
+      font-size: 0.75rem; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); cursor: pointer; font-family: inherit;
+    }
+    .analyze-segment .copy-prompt-btn:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <a href="#" class="navbar-brand" data-panel="nano">Video Generator</a>
+    <nav class="navbar-nav">
+      <a href="#" class="navbar-link active" data-panel="nano" id="navNano">Nano Banana Pro</a>
+      <a href="#" class="navbar-link" data-panel="veo" id="navVeo">Veo 3</a>
+      <a href="#" class="navbar-link" data-panel="analyze" id="navAnalyze">Video to prompts</a>
+      <a href="#" class="navbar-link" data-panel="history" id="navHistory">History</a>
+    </nav>
+    <div class="navbar-actions">
+      <a href="#" class="btn-outline">Sign up</a>
+      <a href="#" class="btn-primary-nav">Login</a>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Nano Banana Pro panel (image generation - same API key as Veo) -->
+    <div class="panel active" id="panelNano" data-panel="nano">
+      <h1>Nano Banana Pro</h1>
+      <p class="subtitle">Image generation with Gemini. Uses the same GCP credentials as Veo — no extra API key.</p>
+      <div class="card">
+        <form id="formNano">
+          <div class="label-row">
+            <label for="promptNano">Prompt</label>
+            <button type="button" class="clear-prompt-btn" data-clear="promptNano" data-storage="nano">Clear</button>
+          </div>
+          <textarea id="promptNano" placeholder="e.g. A photorealistic portrait of a ceramicist in a sun-drenched workshop. 85mm lens, soft bokeh." required></textarea>
+          <div class="examples">
+            <button type="button" class="example-chip" data-target="promptNano" data-prompt="A kawaii sticker of a red panda in a bamboo hat. Clean outlines, cel-shading. White background.">Red panda sticker</button>
+            <button type="button" class="example-chip" data-target="promptNano" data-prompt="A minimalist logo for a coffee shop called The Daily Grind. Bold sans-serif, black and white.">Coffee logo</button>
+            <button type="button" class="example-chip" data-target="promptNano" data-prompt="Studio product photo of a ceramic mug on concrete. Soft lighting, 45-degree angle.">Product shot</button>
+          </div>
+          <div class="field" style="margin-top:1rem">
+            <label>Attach images (max 3)</label>
+            <div class="file-drop-zone" data-input="attachNano" data-multiple="true" data-max="3">
+              <input type="file" id="attachNano" accept="image/*" multiple class="file-input-hidden" />
+              <div class="file-drop-zone-inner">
+                <span class="file-drop-zone-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>
+                <span class="file-drop-zone-text"><strong>Choose files</strong> or drop images here (max 3)</span>
+              </div>
+            </div>
+            <p class="prompt-hint">Optional. Use with prompt for edits, style transfer, or reference.</p>
+            <div id="nanoPreviews" class="attach-previews"></div>
+          </div>
+          <div class="row" style="margin-top:1rem">
+            <div class="field">
+              <label for="modelNano">Model</label>
+              <select id="modelNano"><option value="gemini-2.5-flash-image">Nano Banana</option><option value="gemini-3-pro-image-preview">Nano Banana Pro</option></select>
+            </div>
+            <div class="field">
+              <label for="aspectNano">Aspect ratio</label>
+              <select id="aspectNano"><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="1:1">1:1</option></select>
+            </div>
+            <div class="field">
+              <label for="resolutionNano">Resolution</label>
+              <select id="resolutionNano"><option value="Default">Default</option><option value="1K">1K</option><option value="2K">2K</option><option value="4K">4K</option></select>
+            </div>
+          </div>
+          <div class="field" style="margin-top:1rem">
+            <label for="negativeNano">Avoid / negative prompt</label>
+            <input type="text" id="negativeNano" placeholder="e.g. blurry, low quality, text" />
+          </div>
+          <div class="checkbox-wrap">
+            <input type="checkbox" id="uploadDriveNano" />
+            <label for="uploadDriveNano" style="margin:0;color:inherit">Upload to Google Drive</label>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitNano">Generate image</button>
+        </form>
+        <div id="statusNano" class="status"></div>
+        <div id="resultNano" class="video-wrap" style="display:none;"><img id="imgNano" alt="Generated" style="width:100%;height:100%;object-fit:contain;" /></div>
+        <div id="actionsNano" class="video-actions" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Veo 3 panel -->
+    <div class="panel" id="panelVeo">
+      <h1>Veo 3</h1>
+      <p class="subtitle">Google Vertex AI. High-quality video with optional audio.</p>
+      <div class="card">
+        <form id="formVeo">
+          <div class="label-row">
+            <label for="promptVeo">Prompt</label>
+            <button type="button" class="clear-prompt-btn" data-clear="promptVeo" data-storage="veo">Clear</button>
+          </div>
+          <textarea id="promptVeo" placeholder="e.g. A close-up portrait. Natural daylight, film grain, 35mm style." required></textarea>
+          <div class="examples">
+            <button type="button" class="example-chip" data-target="promptVeo" data-prompt="Ocean waves at sunset. Golden hour, slow motion.">Ocean sunset</button>
+            <button type="button" class="example-chip" data-target="promptVeo" data-prompt="Timelapse of clouds over a mountain range.">Cloud timelapse</button>
+            <button type="button" class="example-chip" data-target="promptVeo" data-prompt="Aerial drone shot over a forest in autumn.">Forest aerial</button>
+          </div>
+          <div class="field" style="margin-top:1rem">
+            <label>Reference images (max 3)</label>
+            <div class="file-drop-zone" data-input="attachVeoRef" data-multiple="true" data-max="3">
+              <input type="file" id="attachVeoRef" accept="image/*" multiple class="file-input-hidden" />
+              <div class="file-drop-zone-inner">
+                <span class="file-drop-zone-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>
+                <span class="file-drop-zone-text"><strong>Choose files</strong> or drop here (max 3)</span>
+              </div>
+            </div>
+            <p class="prompt-hint">Optional. Subject/asset images — Veo preserves appearance in the video.</p>
+            <div id="veoRefPreviews" class="attach-previews"></div>
+          </div>
+          <div class="row" style="margin-top:1rem">
+            <div class="field">
+              <label>First frame (optional)</label>
+              <div class="file-drop-zone file-drop-zone-single" data-input="firstFrameVeo" data-multiple="false">
+                <input type="file" id="firstFrameVeo" accept="image/*" class="file-input-hidden" />
+                <div class="file-drop-zone-inner">
+                  <span class="file-drop-zone-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>
+                  <span class="file-drop-zone-text"><strong>Choose image</strong> or drop</span>
+                </div>
+              </div>
+              <div id="firstFrameVeoPreview" class="attach-previews"></div>
+            </div>
+            <div class="field">
+              <label>Last frame (optional)</label>
+              <div class="file-drop-zone file-drop-zone-single" data-input="lastFrameVeo" data-multiple="false">
+                <input type="file" id="lastFrameVeo" accept="image/*" class="file-input-hidden" />
+                <div class="file-drop-zone-inner">
+                  <span class="file-drop-zone-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 7 8 12 1 17 1 7"/><rect x="8" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>
+                  <span class="file-drop-zone-text"><strong>Choose image</strong> or drop</span>
+                </div>
+              </div>
+              <div id="lastFrameVeoPreview" class="attach-previews"></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:1rem">
+            <div class="field">
+              <label for="model_id">Model</label>
+              <select id="model_id"><option value="veo-3.1-generate-001">Veo 3.1 (Quality)</option><option value="veo-3.1-fast-generate-001">Veo 3.1 Fast</option><option value="veo-3.0-generate-001">Veo 3.0</option></select>
+            </div>
+            <div class="field">
+              <label for="aspect_ratio">Aspect ratio</label>
+              <select id="aspect_ratio"><option value="16:9">16:9</option><option value="9:16">9:16</option></select>
+            </div>
+            <div class="field">
+              <label for="duration">Duration</label>
+              <select id="duration"><option value="4">4 sec</option><option value="6" selected>6 sec</option><option value="8">8 sec</option><option value="15">15 sec</option></select>
+            </div>
+            <div class="field">
+              <label for="resolution">Resolution</label>
+              <select id="resolution"><option value="720p">720p</option><option value="1080p">1080p</option><option value="4k">4K</option></select>
+            </div>
+          </div>
+          <div class="checkbox-wrap">
+            <input type="checkbox" id="generate_audio" />
+            <label for="generate_audio" style="margin:0;color:inherit">Generate audio</label>
+          </div>
+          <div class="checkbox-wrap">
+            <input type="checkbox" id="upload_drive" />
+            <label for="upload_drive" style="margin:0;color:inherit">Upload to Google Drive</label>
+          </div>
+          <div class="toggle-adv" id="toggleAdv" role="button" tabindex="0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg> Advanced</div>
+          <div class="advanced" id="advanced">
+            <label for="negative_prompt">Negative prompt</label>
+            <input type="text" id="negative_prompt" placeholder="e.g. blurry, low quality" />
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitVeo">Generate video</button>
+        </form>
+        <div id="statusVeo" class="status"></div>
+        <div id="resultVeo" class="video-wrap" style="display:none;"><video id="videoVeo" controls playsinline></video></div>
+        <div id="actionsVeo" class="video-actions" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Video to prompts panel -->
+    <div class="panel" id="panelAnalyze" data-panel="analyze">
+      <h1>Video to prompts</h1>
+      <p class="subtitle">Upload a video. We extract what happens each few seconds and give you prompts to replicate it with your character in Veo.</p>
+      <div class="card">
+        <div class="field">
+          <label>Upload video</label>
+            <div class="file-drop-zone" id="analyzeVideoZone" data-input="analyzeVideoInput" data-multiple="false">
+            <input type="file" id="analyzeVideoInput" accept="video/mp4,video/webm,video/quicktime" class="file-input-hidden" />
+            <div class="file-drop-zone-inner">
+              <span class="file-drop-zone-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>
+              <span class="file-drop-zone-text"><strong>Choose video</strong> or drop (max 50 MB, MP4/WebM)</span>
+            </div>
+          </div>
+          <p id="analyzeVideoName" class="prompt-hint" style="margin-top:0.35rem; display:none;"></p>
+        </div>
+        <button type="button" class="btn btn-primary" id="analyzeVideoBtn" style="margin-top:1rem">Analyze video</button>
+        <div id="analyzeStatus" class="status" style="margin-top:1rem"></div>
+        <div id="analyzeResult" class="analyze-result" style="display:none; margin-top:1rem;"></div>
+      </div>
+    </div>
+
+    <!-- History panel -->
+    <div class="panel" id="panelHistory">
+      <h1>History</h1>
+      <p class="subtitle">Past generations. Download or open in Drive.</p>
+      <div class="card">
+        <ul id="historyList" class="history-list"></ul>
+        <p id="historyEmpty" class="history-empty">No generations yet.</p>
+      </div>
+    </div>
+
+    <p id="configBadge" class="config-badge"></p>
+  </main>
+
+  <script>
+    (function() {
+      var STORAGE_NANO = 'video_gen_nano';
+      var STORAGE_VEO = 'video_gen_veo';
+      var nanoFields = { promptNano: 'value', modelNano: 'value', aspectNano: 'value', resolutionNano: 'value', negativeNano: 'value', uploadDriveNano: 'checked' };
+      var veoFields = { promptVeo: 'value', model_id: 'value', aspect_ratio: 'value', duration: 'value', resolution: 'value', generate_audio: 'checked', upload_drive: 'checked', negative_prompt: 'value' };
+
+      function getFormState(fieldIds) {
+        var state = {};
+        for (var id in fieldIds) {
+          var el = document.getElementById(id);
+          if (!el) continue;
+          var prop = fieldIds[id];
+          state[id] = prop === 'checked' ? el.checked : (el.value || '');
+        }
+        return state;
+      }
+      function setFormState(fieldIds, state) {
+        if (!state) return;
+        for (var id in fieldIds) {
+          var el = document.getElementById(id);
+          if (!el || state[id] === undefined) continue;
+          var prop = fieldIds[id];
+          if (prop === 'checked') el.checked = !!state[id];
+          else el.value = state[id];
+        }
+      }
+      function saveNano() { try { localStorage.setItem(STORAGE_NANO, JSON.stringify(getFormState(nanoFields))); } catch (e) {} }
+      function saveVeo() { try { localStorage.setItem(STORAGE_VEO, JSON.stringify(getFormState(veoFields))); } catch (e) {} }
+      function loadNano() { try { var s = localStorage.getItem(STORAGE_NANO); setFormState(nanoFields, s ? JSON.parse(s) : null); } catch (e) {} }
+      function loadVeo() { try { var s = localStorage.getItem(STORAGE_VEO); setFormState(veoFields, s ? JSON.parse(s) : null); } catch (e) {} }
+
+      loadNano();
+      loadVeo();
+      document.querySelectorAll('#formNano select, #formNano input[type="text"], #formNano input[type="checkbox"], #formNano textarea').forEach(function(el) {
+        el.addEventListener('change', saveNano);
+        el.addEventListener('input', saveNano);
+      });
+      document.querySelectorAll('#formVeo select, #formVeo input[type="text"], #formVeo input[type="number"], #formVeo input[type="checkbox"], #formVeo textarea').forEach(function(el) {
+        el.addEventListener('change', saveVeo);
+        el.addEventListener('input', saveVeo);
+      });
+
+      var currentPanel = 'nano';
+      var panelNavMap = { nano: 'Nano', veo: 'Veo', analyze: 'Analyze', history: 'History' };
+      function showPanel(id) {
+        currentPanel = id;
+        document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+        var name = panelNavMap[id] || id;
+        var panel = document.getElementById('panel' + name);
+        var nav = document.getElementById('nav' + name);
+        document.querySelectorAll('.navbar-link').forEach(function(l) { l.classList.remove('active'); });
+        if (panel) panel.classList.add('active');
+        if (nav) nav.classList.add('active');
+        if (id === 'history') loadHistory();
+      }
+      document.querySelectorAll('.navbar-link[data-panel], .navbar-brand[data-panel]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) { e.preventDefault(); showPanel(btn.getAttribute('data-panel')); });
+      });
+
+      document.querySelectorAll('.example-chip').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var el = document.getElementById(btn.getAttribute('data-target'));
+          if (el) el.value = btn.getAttribute('data-prompt') || '';
+        });
+      });
+
+      document.querySelectorAll('.clear-prompt-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var id = btn.getAttribute('data-clear');
+          var storage = btn.getAttribute('data-storage');
+          var el = document.getElementById(id);
+          if (el) {
+            el.value = '';
+            if (storage === 'nano') saveNano();
+            else if (storage === 'veo') saveVeo();
+          }
+        });
+      });
+
+      document.getElementById('toggleAdv').addEventListener('click', function() {
+        document.getElementById('advanced').classList.toggle('visible');
+        this.classList.toggle('open');
+      });
+
+      var nanoAttachFiles = [];
+      var nanoPreviewUrls = [];
+      function renderNanoPreviews() {
+        nanoPreviewUrls.forEach(function(u) { try { URL.revokeObjectURL(u); } catch (e) {} });
+        nanoPreviewUrls = [];
+        var container = document.getElementById('nanoPreviews');
+        container.innerHTML = '';
+        nanoAttachFiles.forEach(function(file, i) {
+          var wrap = document.createElement('div');
+          wrap.className = 'wrap';
+          var img = document.createElement('img');
+          img.className = 'thumb';
+          var url = URL.createObjectURL(file);
+          nanoPreviewUrls.push(url);
+          img.src = url;
+          var rm = document.createElement('button');
+          rm.type = 'button';
+          rm.className = 'remove';
+          rm.textContent = '×';
+          rm.setAttribute('aria-label', 'Remove');
+          rm.addEventListener('click', function() {
+            nanoAttachFiles.splice(i, 1);
+            renderNanoPreviews();
+          });
+          wrap.appendChild(img);
+          wrap.appendChild(rm);
+          container.appendChild(wrap);
+        });
+      }
+      document.getElementById('attachNano').addEventListener('change', function(ev) {
+        nanoAttachFiles = Array.from(ev.target.files || []).slice(0, 3);
+        renderNanoPreviews();
+      });
+
+      var veoRefFiles = [];
+      var veoRefPreviewUrls = [];
+      var firstFrameVeoFile = null;
+      var firstFrameVeoPreviewUrl = null;
+      var lastFrameVeoFile = null;
+      var lastFrameVeoPreviewUrl = null;
+      function renderVeoRefPreviews() {
+        veoRefPreviewUrls.forEach(function(u) { try { URL.revokeObjectURL(u); } catch (e) {} });
+        veoRefPreviewUrls = [];
+        var container = document.getElementById('veoRefPreviews');
+        container.innerHTML = '';
+        veoRefFiles.forEach(function(file, i) {
+          var wrap = document.createElement('div');
+          wrap.className = 'wrap';
+          var img = document.createElement('img');
+          img.className = 'thumb';
+          var url = URL.createObjectURL(file);
+          veoRefPreviewUrls.push(url);
+          img.src = url;
+          var rm = document.createElement('button');
+          rm.type = 'button';
+          rm.className = 'remove';
+          rm.textContent = '×';
+          rm.setAttribute('aria-label', 'Remove');
+          rm.addEventListener('click', function() {
+            veoRefFiles.splice(i, 1);
+            renderVeoRefPreviews();
+          });
+          wrap.appendChild(img);
+          wrap.appendChild(rm);
+          container.appendChild(wrap);
+        });
+      }
+      function renderVeoSinglePreview(containerId, file, urlVar, inputId) {
+        if (window[urlVar]) try { URL.revokeObjectURL(window[urlVar]); } catch (e) {}
+        window[urlVar] = null;
+        var container = document.getElementById(containerId);
+        container.innerHTML = '';
+        if (!file) return;
+        var url = URL.createObjectURL(file);
+        window[urlVar] = url;
+        var wrap = document.createElement('div');
+        wrap.className = 'wrap';
+        var img = document.createElement('img');
+        img.className = 'thumb';
+        img.src = url;
+        var rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'remove';
+        rm.textContent = '×';
+        rm.setAttribute('aria-label', 'Remove');
+        rm.addEventListener('click', function() {
+          if (containerId === 'firstFrameVeoPreview') firstFrameVeoFile = null;
+          else lastFrameVeoFile = null;
+          var inp = document.getElementById(inputId);
+          if (inp) inp.value = '';
+          renderVeoSinglePreview(containerId, null, urlVar, inputId);
+        });
+        wrap.appendChild(img);
+        wrap.appendChild(rm);
+        container.appendChild(wrap);
+      }
+      document.getElementById('attachVeoRef').addEventListener('change', function(ev) {
+        veoRefFiles = Array.from(ev.target.files || []).slice(0, 3);
+        renderVeoRefPreviews();
+      });
+      document.getElementById('firstFrameVeo').addEventListener('change', function(ev) {
+        var f = (ev.target.files && ev.target.files[0]) || null;
+        firstFrameVeoFile = f;
+        renderVeoSinglePreview('firstFrameVeoPreview', f, 'firstFrameVeoPreviewUrl', 'firstFrameVeo');
+      });
+      document.getElementById('lastFrameVeo').addEventListener('change', function(ev) {
+        var f = (ev.target.files && ev.target.files[0]) || null;
+        lastFrameVeoFile = f;
+        renderVeoSinglePreview('lastFrameVeoPreview', f, 'lastFrameVeoPreviewUrl', 'lastFrameVeo');
+      });
+
+      function isImageFile(file) {
+        return file.type && file.type.indexOf('image/') === 0;
+      }
+      function isVideoFile(file) {
+        return file.type && file.type.indexOf('video/') === 0;
+      }
+      var analyzeVideoFile = null;
+      function setAnalyzeVideoName(file) {
+        var el = document.getElementById('analyzeVideoName');
+        if (!el) return;
+        if (file) { el.textContent = 'Selected: ' + file.name; el.style.display = 'block'; }
+        else { el.textContent = ''; el.style.display = 'none'; }
+      }
+      function setupDropZone(zone) {
+        var inputId = zone.getAttribute('data-input');
+        var multiple = zone.getAttribute('data-multiple') === 'true';
+        var max = parseInt(zone.getAttribute('data-max') || '1', 10);
+        var input = document.getElementById(inputId);
+        if (!input) return;
+        zone.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', function(e) {
+          if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          zone.classList.remove('drag-over');
+          if (inputId === 'analyzeVideoInput') {
+            var files = Array.from(e.dataTransfer.files || []).filter(isVideoFile);
+            if (files.length > 0) { analyzeVideoFile = files[0]; setAnalyzeVideoName(analyzeVideoFile); }
+            return;
+          }
+          var files = Array.from(e.dataTransfer.files || []).filter(isImageFile);
+          if (files.length === 0) return;
+          if (inputId === 'attachNano') {
+            nanoAttachFiles = files.slice(0, max);
+            renderNanoPreviews();
+          } else if (inputId === 'attachVeoRef') {
+            veoRefFiles = files.slice(0, max);
+            renderVeoRefPreviews();
+          } else if (inputId === 'firstFrameVeo') {
+            firstFrameVeoFile = files[0] || null;
+            renderVeoSinglePreview('firstFrameVeoPreview', firstFrameVeoFile, 'firstFrameVeoPreviewUrl', 'firstFrameVeo');
+            input.value = '';
+          } else if (inputId === 'lastFrameVeo') {
+            lastFrameVeoFile = files[0] || null;
+            renderVeoSinglePreview('lastFrameVeoPreview', lastFrameVeoFile, 'lastFrameVeoPreviewUrl', 'lastFrameVeo');
+            input.value = '';
+          }
+        });
+      }
+      document.querySelectorAll('.file-drop-zone').forEach(setupDropZone);
+      document.getElementById('analyzeVideoInput').addEventListener('change', function(ev) {
+        var f = (ev.target.files && ev.target.files[0]) || null;
+        analyzeVideoFile = f;
+        setAnalyzeVideoName(f);
+      });
+      document.getElementById('analyzeVideoBtn').addEventListener('click', function() {
+        var input = document.getElementById('analyzeVideoInput');
+        var file = (input.files && input.files[0]) || analyzeVideoFile;
+        if (!file) {
+          var st = document.getElementById('analyzeStatus');
+          st.className = 'status visible failed';
+          st.textContent = 'Please select or drop a video first.';
+          return;
+        }
+        var statusEl = document.getElementById('analyzeStatus');
+        var resultEl = document.getElementById('analyzeResult');
+        statusEl.className = 'status visible generating';
+        statusEl.innerHTML = '<span class="spinner"></span> Analyzing video…';
+        resultEl.style.display = 'none';
+        resultEl.innerHTML = '';
+        var form = new FormData();
+        form.append('video', file);
+        fetch('/api/analyze-video', { method: 'POST', body: form })
+          .then(function(r) { return r.json().catch(function() { return {}; }).then(function(d) { return { ok: r.ok, data: d }; }); })
+          .then(function(res) {
+            if (!res.ok) {
+              statusEl.className = 'status visible failed';
+              statusEl.textContent = 'Error: ' + (res.data.detail || 'Request failed');
+              return;
+            }
+            statusEl.className = 'status visible done';
+            statusEl.textContent = 'Done. Use the prompts below in Veo 3 with your character reference.';
+            var segments = res.data.segments || [];
+            resultEl.style.display = 'block';
+            segments.forEach(function(seg, i) {
+              var card = document.createElement('div');
+              card.className = 'analyze-segment';
+              var timeStr = (seg.start_sec != null ? seg.start_sec : i * 6) + 's – ' + (seg.end_sec != null ? seg.end_sec : (i + 1) * 6) + 's';
+              var html = '<div class="segment-time">' + timeStr + '</div><div class="segment-desc">' + (seg.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+              if (seg.singing && seg.singing.trim()) html += '<div class="segment-singing"><strong>Singing / speech</strong>: ' + (seg.singing || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+              if (seg.background_sounds && seg.background_sounds.trim()) html += '<div class="segment-sounds"><strong>Background sounds</strong>: ' + (seg.background_sounds || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+              html += '<div class="segment-prompt">' + (seg.prompt || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div><button type="button" class="copy-prompt-btn">Copy prompt</button>';
+              card.innerHTML = html;
+              var copyBtn = card.querySelector('.copy-prompt-btn');
+              var promptText = seg.prompt || '';
+              copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(promptText).then(function() { copyBtn.textContent = 'Copied!'; setTimeout(function() { copyBtn.textContent = 'Copy prompt'; }, 1500); });
+              });
+              resultEl.appendChild(card);
+            });
+          })
+          .catch(function(err) {
+            statusEl.className = 'status visible failed';
+            statusEl.textContent = 'Error: ' + err.message;
+          });
+      });
+
+      function setStatus(panel, msg, type) {
+        var el = document.getElementById('status' + (panel === 'nano' ? 'Nano' : 'Veo'));
+        if (!el) return;
+        el.className = 'status visible ' + (type || '');
+        el.innerHTML = type === 'generating' ? '<span class="spinner"></span>' + msg : msg;
+      }
+      var lastVeoJobId = null;
+      function showResult(panel, mediaUrl, driveUrl, isImage, jobId) {
+        var pre = panel === 'nano' ? 'Nano' : 'Veo';
+        var wrap = document.getElementById('result' + pre);
+        var actions = document.getElementById('actions' + pre);
+        if (!wrap) return;
+        wrap.style.display = 'block';
+        actions.style.display = 'flex';
+        if (panel === 'nano' && isImage) {
+          var img = document.getElementById('imgNano');
+          if (img) { img.src = mediaUrl; img.alt = 'Generated image'; }
+          actions.innerHTML = '<a href="' + mediaUrl + '" download="image.png">Download</a> <a href="' + mediaUrl + '" target="_blank" rel="noopener">Open in new tab</a>' + (driveUrl ? ' <a href="' + driveUrl + '" target="_blank" rel="noopener">Open in Drive</a>' : '');
+        } else {
+          var vid = document.getElementById('videoVeo');
+          if (vid) vid.src = mediaUrl;
+          lastVeoJobId = jobId || null;
+          actions.innerHTML = '<a href="' + mediaUrl + '" download="video.mp4">Download</a>' + (driveUrl ? ' <a href="' + driveUrl + '" target="_blank" rel="noopener">Open in Drive</a>' : '');
+        }
+      }
+      function hideResult(panel) {
+        var pre = panel === 'nano' ? 'Nano' : 'Veo';
+        document.getElementById('result' + pre).style.display = 'none';
+        document.getElementById('actions' + pre).style.display = 'none';
+        if (panel === 'nano') {
+          var img = document.getElementById('imgNano');
+          if (img) img.src = '';
+        } else {
+          var vid = document.getElementById('videoVeo');
+          if (vid) vid.src = '';
+        }
+        document.getElementById('actions' + pre).innerHTML = '';
+        lastVeoJobId = null;
+      }
+
+      function loadHistory() {
+        fetch('/api/history').then(function(r) { return r.json(); }).then(function(items) {
+          var list = document.getElementById('historyList');
+          var empty = document.getElementById('historyEmpty');
+          list.innerHTML = '';
+          if (!items || items.length === 0) { empty.style.display = 'block'; return; }
+          empty.style.display = 'none';
+          items.slice().reverse().forEach(function(item) {
+            var li = document.createElement('li');
+            li.className = 'history-item ' + item.status + (item.status === 'failed' ? ' failed' : '');
+            var promptText = (item.prompt || '').substring(0, 70) + (item.prompt && item.prompt.length > 70 ? '…' : '');
+            var providerLabel = item.provider === 'nano_banana_image' ? 'Nano Banana Pro (image)' : item.provider === 'nano_banana' ? 'Nano Banana Video' : 'Veo 3';
+            var meta = providerLabel + ' · ' + (item.status || '');
+            if (item.created_at) meta += ' · ' + new Date(item.created_at * 1000).toLocaleString();
+            var links = '';
+            if (item.status === 'done') {
+              if (item.image_url || item.provider === 'nano_banana_image') {
+                var imgUrl = item.image_url || '/api/jobs/' + item.job_id + '/image';
+                links = '<a href="' + imgUrl + '" download="image.png">Download</a> <a href="' + imgUrl + '" target="_blank" rel="noopener">Open in new tab</a>';
+              }
+              else
+                links = '<a href="/api/jobs/' + item.job_id + '/video" download>Download</a>';
+              if (item.drive_url) links += ' <a href="' + item.drive_url + '" target="_blank" rel="noopener">Open in Drive</a>';
+            }
+            if (item.status === 'failed' && item.error) meta += ' · ' + item.error;
+            li.innerHTML = '<div class="prompt-text">' + promptText + '</div><div class="meta">' + meta + '</div>' + (links ? '<div class="links">' + links + '</div>' : '');
+            list.appendChild(li);
+          });
+        }).catch(function() {});
+      }
+
+      function pollJob(jobId, panel) {
+        fetch('/api/jobs/' + jobId).then(function(r) { return r.json(); }).then(function(data) {
+          if (data.status === 'done') {
+            var isImage = panel === 'nano' && data.image_url;
+            setStatus(panel, isImage ? 'Image ready.' + (data.drive_url ? ' Uploaded to Drive.' : '') : 'Video ready.' + (data.drive_url ? ' Uploaded to Drive.' : ''), 'done');
+            if (isImage) showResult(panel, data.image_url || ('/api/jobs/' + jobId + '/image'), data.drive_url || null, true);
+            else showResult(panel, '/api/jobs/' + jobId + '/video', data.drive_url || null, false, jobId);
+            document.getElementById('submit' + (panel === 'nano' ? 'Nano' : 'Veo')).disabled = false;
+            loadHistory();
+            return;
+          }
+          if (data.status === 'failed') {
+            setStatus(panel, 'Failed: ' + (data.error || 'Unknown error'), 'failed');
+            document.getElementById('submit' + (panel === 'nano' ? 'Nano' : 'Veo')).disabled = false;
+            loadHistory();
+            return;
+          }
+          setStatus(panel, 'Generating… Polling…', 'generating');
+          setTimeout(function() { pollJob(jobId, panel); }, panel === 'nano' ? 3000 : 8000);
+        });
+      }
+
+      function fileToBase64(file) {
+        return new Promise(function(resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function() {
+            var data = reader.result.split(',')[1];
+            var mime = file.type || 'image/png';
+            resolve({ data: data, mime_type: mime });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      document.getElementById('formNano').addEventListener('submit', function(e) {
+        e.preventDefault();
+        hideResult('nano');
+        var btn = document.getElementById('submitNano');
+        btn.disabled = true;
+        setStatus('nano', 'Generating image…', 'generating');
+        var body = {
+          prompt: document.getElementById('promptNano').value.trim(),
+          model_id: document.getElementById('modelNano').value,
+          aspect_ratio: document.getElementById('aspectNano').value,
+          resolution: document.getElementById('resolutionNano').value,
+          negative_prompt: document.getElementById('negativeNano').value.trim() || null,
+          upload_drive: document.getElementById('uploadDriveNano').checked
+        };
+        var send = function() {
+          fetch('/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+            .then(function(r) { return r.json().catch(function() { return {}; }).then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(r) {
+              if (!r.ok) { setStatus('nano', 'Error: ' + (r.data.detail || 'Request failed'), 'failed'); btn.disabled = false; return; }
+              pollJob(r.data.job_id, 'nano');
+            })
+            .catch(function(err) { setStatus('nano', 'Error: ' + err.message, 'failed'); btn.disabled = false; });
+        };
+        if (nanoAttachFiles.length > 0) {
+          Promise.all(nanoAttachFiles.map(fileToBase64)).then(function(images) {
+            body.images = images;
+            send();
+          }).catch(function(err) { setStatus('nano', 'Error: ' + err.message, 'failed'); btn.disabled = false; });
+        } else {
+          send();
+        }
+      });
+
+      document.getElementById('formVeo').addEventListener('submit', function(e) {
+        e.preventDefault();
+        hideResult('veo');
+        var btn = document.getElementById('submitVeo');
+        btn.disabled = true;
+        setStatus('veo', 'Starting…', 'generating');
+        var body = {
+          prompt: document.getElementById('promptVeo').value.trim(),
+          provider: 'veo',
+          aspect_ratio: document.getElementById('aspect_ratio').value,
+          duration_seconds: parseInt(document.getElementById('duration').value, 10),
+          resolution: document.getElementById('resolution').value,
+          upload_drive: document.getElementById('upload_drive').checked,
+          generate_audio: document.getElementById('generate_audio').checked,
+          model_id: document.getElementById('model_id').value,
+          negative_prompt: document.getElementById('negative_prompt').value.trim() || null
+        };
+        var send = function() {
+          fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+            .then(function(r) { return r.json().catch(function() { return {}; }).then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(r) {
+              if (!r.ok) { setStatus('veo', 'Error: ' + (r.data.detail || 'Request failed'), 'failed'); btn.disabled = false; return; }
+              pollJob(r.data.job_id, 'veo');
+            })
+            .catch(function(err) { setStatus('veo', 'Error: ' + err.message, 'failed'); btn.disabled = false; });
+        };
+        var refPromises = veoRefFiles.slice(0, 3).map(fileToBase64);
+        var firstPromise = firstFrameVeoFile ? fileToBase64(firstFrameVeoFile) : Promise.resolve(null);
+        var lastPromise = lastFrameVeoFile ? fileToBase64(lastFrameVeoFile) : Promise.resolve(null);
+        Promise.all([Promise.all(refPromises), firstPromise, lastPromise]).then(function(results) {
+          var refImages = results[0];
+          if (refImages.length > 0) body.reference_images = refImages;
+          if (results[1]) body.first_frame = results[1];
+          if (results[2]) body.last_frame = results[2];
+          send();
+        }).catch(function(err) { setStatus('veo', 'Error: ' + err.message, 'failed'); btn.disabled = false; });
+      });
+
+      fetch('/api/config').then(function(r) { return r.json(); }).then(function(c) {
+        var line = [];
+        if (c.project_configured) line.push('GCP (Veo + Nano Banana image): ' + (c.location || 'OK'));
+        else line.push('Set GOOGLE_APPLICATION_CREDENTIALS for Veo and image gen');
+        if (c.nano_banana_configured) line.push('Nano Banana Video API: OK');
+        else line.push('Nano Banana Video: optional NANO_BANANA_API_KEY');
+        document.getElementById('configBadge').textContent = line.join(' · ');
+      }).catch(function() {});
+    })();
+  </script>
+</body>
+</html>
