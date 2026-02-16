@@ -19,6 +19,17 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Optional
 
+# Vercel / serverless: if key is in env as JSON string, write to temp file so GCP libs can use it
+_creds_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+if _creds_json and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    try:
+        _f = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        _f.write(_creds_json)
+        _f.close()
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _f.name
+    except Exception:
+        pass
+
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
