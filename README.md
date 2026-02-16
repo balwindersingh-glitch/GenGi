@@ -18,3 +18,4 @@ This is the GenGi project. Work in progress.
 - requirements.txt
 - run.sh
 - setup-gcs-permissions.sh
+\n## Live Site\n- [GenGi Live](https://gen-gi.vercel.app/)
