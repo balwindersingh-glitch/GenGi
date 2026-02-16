@@ -27,11 +27,11 @@
       color: var(--text);
       min-height: 100vh;
       line-height: 1.5;
-      display: flex;
+      display: block;
       flex-direction: column;
     }
     .navbar {
-      display: flex;
+      display: block;
       align-items: center;
       justify-content: space-between;
       padding: 0.875rem 1.5rem;
@@ -46,7 +46,7 @@
       text-decoration: none;
     }
     .navbar-nav {
-      display: flex;
+      display: block;
       align-items: center;
       gap: 0.5rem;
     }
@@ -61,7 +61,7 @@
     .navbar-link:hover { color: var(--text); background: var(--surface-hover); }
     .navbar-link.active { color: var(--accent); background: rgba(167, 139, 250, 0.12); }
     .navbar-actions {
-      display: flex;
+      display: block;
       align-items: center;
       gap: 0.5rem;
     }
@@ -120,19 +120,19 @@
     textarea { min-height: 110px; resize: vertical; }
     textarea::placeholder, input::placeholder { color: var(--muted); }
     textarea:focus, input:focus { outline: none; border-color: var(--accent); }
-    .row { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .row { display: block; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
     .field { flex: 1; min-width: 120px; }
     select {
       width: 100%; padding: 0.5rem 0.75rem; background: var(--bg); border: 1px solid var(--border);
       border-radius: 6px; color: var(--text); font-family: inherit; font-size: 0.875rem; cursor: pointer;
     }
-    .checkbox-wrap { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+    .checkbox-wrap { display: block; align-items: center; gap: 0.5rem; margin-top: 1rem; }
     .checkbox-wrap input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
     .btn { font-family: inherit; font-weight: 600; font-size: 0.9375rem; padding: 0.75rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; transition: background 0.15s; }
     .btn-primary { background: var(--accent); color: var(--bg); margin-top: 1rem; }
     .btn-primary:hover { background: var(--accent-hover); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-    .toggle-adv { margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--muted); font-size: 0.875rem; }
+    .toggle-adv { margin-top: 1rem; display: block; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--muted); font-size: 0.875rem; }
     .toggle-adv:hover { color: var(--accent); }
     .toggle-adv.open svg { transform: rotate(180deg); }
     .advanced { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
@@ -146,17 +146,17 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .video-wrap { margin-top: 1rem; border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 16/9; }
     .video-wrap video { width: 100%; height: 100%; display: block; }
-    .video-actions { margin-top: 0.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .video-actions { margin-top: 0.75rem; display: block; gap: 0.75rem; flex-wrap: wrap; }
     .video-actions a { font-size: 0.875rem; color: var(--accent); text-decoration: none; }
     .video-actions a:hover { text-decoration: underline; }
-    .examples { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .examples { display: block; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
     .example-chip {
       padding: 0.4rem 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
       font-size: 0.8125rem; color: var(--muted); cursor: pointer; transition: border-color 0.15s, color 0.15s;
     }
     .example-chip:hover { border-color: var(--accent); color: var(--accent); }
     .prompt-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
-    .label-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.375rem; }
+    .label-row { display: block; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.375rem; }
     .label-row label { margin-bottom: 0; flex: 1; }
     .clear-prompt-btn {
       font-size: 0.75rem; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border);
@@ -175,7 +175,7 @@
     .history-item.failed { border-color: rgba(248,113,113,0.4); }
     .history-empty { color: var(--muted); font-size: 0.9rem; padding: 1rem 0; }
     .config-badge { font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 1rem; }
-    .attach-previews { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .attach-previews { display: block; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
     .attach-previews .thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
     .attach-previews .wrap { position: relative; }
     .attach-previews .remove { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%; border: none; background: var(--error); color: #fff; font-size: 12px; cursor: pointer; line-height: 1; padding: 0; }
@@ -188,7 +188,7 @@
       background: var(--bg);
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
       min-height: 72px;
-      display: flex;
+      display: block;
       align-items: center;
       justify-content: center;
     }
@@ -212,7 +212,7 @@
       z-index: 1;
     }
     .file-drop-zone-inner {
-      display: flex;
+      display: block;
       align-items: center;
       gap: 0.75rem;
       padding: 1rem 1.25rem;
@@ -230,7 +230,7 @@
       border-radius: 10px;
       background: var(--surface);
       border: 1px solid var(--border);
-      display: flex;
+      display: block;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
