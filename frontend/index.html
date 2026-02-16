@@ -275,16 +275,16 @@
 </head>
 <body>
   <header class="navbar">
-    <a href="/" class="navbar-brand" data-panel="nano">Video Generator</a>
+    <a href="#" class="navbar-brand" data-panel="nano">Video Generator</a>
     <nav class="navbar-nav">
-      <a href="/" class="navbar-link active" data-panel="nano" id="navNano">Nano Banana Pro</a>
-      <a href="/" class="navbar-link" data-panel="veo" id="navVeo">Veo 3</a>
-      <a href="/" class="navbar-link" data-panel="analyze" id="navAnalyze">Video to prompts</a>
-      <a href="/" class="navbar-link" data-panel="history" id="navHistory">History</a>
+      <a href="#" class="navbar-link active" data-panel="nano" id="navNano">Nano Banana Pro</a>
+      <a href="#" class="navbar-link" data-panel="veo" id="navVeo">Veo 3</a>
+      <a href="#" class="navbar-link" data-panel="analyze" id="navAnalyze">Video to prompts</a>
+      <a href="#" class="navbar-link" data-panel="history" id="navHistory">History</a>
     </nav>
     <div class="navbar-actions">
-      <a href="/" class="btn-outline">Sign up</a>
-      <a href="/" class="btn-primary-nav">Login</a>
+      <a href="#" class="btn-outline">Sign up</a>
+      <a href="#" class="btn-primary-nav">Login</a>
     </div>
   </header>
 
@@ -531,7 +531,13 @@
         if (id === 'history') loadHistory();
       }
       document.querySelectorAll('.navbar-link[data-panel], .navbar-brand[data-panel]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) { e.preventDefault(); showPanel(btn.getAttribute('data-panel')); });
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var panelId = btn.getAttribute('data-panel');
+          if (panelId) showPanel(panelId);
+          return false;
+        });
       });
 
       document.querySelectorAll('.example-chip').forEach(function(btn) {
