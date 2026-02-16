@@ -961,7 +961,6 @@
 
       fetch('/api/config').then(function(r) { return r.json(); }).then(function(c) {
         var line = [];
-        if (c.project_configured) line.push('GCP (Veo + Nano Banana image): ' + (c.location || 'OK'));
         else line.push('Set GOOGLE_APPLICATION_CREDENTIALS for Veo and image gen');
         if (c.nano_banana_configured) line.push('Nano Banana Video API: OK');
         else line.push('Nano Banana Video: optional NANO_BANANA_API_KEY');
