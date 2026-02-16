@@ -1,6 +1,6 @@
 """
 Web UI backend for Veo and Nano Banana Pro video generation.
-Run: uvicorn app:app --reload
+Run: uvicorn main:app --reload
 """
 import warnings
 

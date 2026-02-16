@@ -25,4 +25,4 @@ fi
 . "$VENV/bin/activate"
 pip install -q --upgrade pip
 pip install -q -r requirements.txt
-exec python -m uvicorn app:app --reload
+exec python -m uvicorn main:app --reload
