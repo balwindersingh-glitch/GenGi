@@ -275,23 +275,23 @@
 </head>
 <body>
   <header class="navbar">
-    <a href="#" class="navbar-brand" data-panel="nano">Video Generator</a>
+    <a href="/nano" class="navbar-brand" data-panel="nano">Video Generator</a>
     <nav class="navbar-nav">
-      <a href="#" class="navbar-link active" data-panel="nano" id="navNano">Nano Banana Pro</a>
-      <a href="#" class="navbar-link" data-panel="veo" id="navVeo">Veo 3</a>
-      <a href="#" class="navbar-link" data-panel="analyze" id="navAnalyze">Prompts</a>
-      <a href="#" class="navbar-link" data-panel="history" id="navHistory">History</a>
+      <a href="/nano" class="navbar-link active" data-panel="nano" id="navNano">Nano Banana Pro<<</a>
+      <a href="/nano" class="navbar-link" data-panel="veo" id="navVeo">Veo 3</a>
+      <a href="/nano" class="navbar-link" data-panel="analyze" id="navAnalyze">Prompts</a>
+      <a href="/nano" class="navbar-link" data-panel="history" id="navHistory">History</a>
     </nav>
     <div class="navbar-actions">
-      <a href="#" class="btn-outline">Sign up</a>
-      <a href="#" class="btn-primary-nav">Login</a>
+      <a href="/nano" class="btn-outline">Sign up</a>
+      <a href="/nano" class="btn-primary-nav">Login</a>
     </div>
   </header>
 
   <main class="main">
-    <!-- Nano Banana Pro panel (image generation - same API key as Veo) -->
+    <!-- Nano Banana Pro<< panel (image generation - same API key as Veo) -->
     <div class="panel active" id="panelNano" data-panel="nano">
-      <h1>Nano Banana Pro</h1>
+      <h1>Nano Banana Pro<<</h1>
       <p class="subtitle">Image generation with Gemini. Uses the same GCP credentials as Veo — no extra API key.</p>
       <div class="card">
         <form id="formNano">
@@ -320,7 +320,7 @@
           <div class="row" style="margin-top:1rem">
             <div class="field">
               <label for="modelNano">Model</label>
-              <select id="modelNano"><option value="gemini-2.5-flash-image">Nano Banana</option><option value="gemini-3-pro-image-preview">Nano Banana Pro</option></select>
+              <select id="modelNano"><option value="gemini-2.5-flash-image">Nano Banana</option><option value="gemini-3-pro-image-preview">Nano Banana Pro<<</option></select>
             </div>
             <div class="field">
               <label for="aspectNano">Aspect ratio</label>
@@ -833,7 +833,7 @@
             var li = document.createElement('li');
             li.className = 'history-item ' + item.status + (item.status === 'failed' ? ' failed' : '');
             var promptText = (item.prompt || '').substring(0, 70) + (item.prompt && item.prompt.length > 70 ? '…' : '');
-            var providerLabel = item.provider === 'nano_banana_image' ? 'Nano Banana Pro (image)' : item.provider === 'nano_banana' ? 'Nano Banana Video' : 'Veo 3';
+            var providerLabel = item.provider === 'nano_banana_image' ? 'Nano Banana Pro<< (image)' : item.provider === 'nano_banana' ? 'Nano Banana Video' : 'Veo 3';
             var meta = providerLabel + ' · ' + (item.status || '');
             if (item.created_at) meta += ' · ' + new Date(item.created_at * 1000).toLocaleString();
             var links = '';
@@ -974,7 +974,7 @@ n<!-- Footer -->
   <div class="navbar">
     <p>&copy; 2023 GenGi. All rights reserved.</p>
     <p>Contact us: info@example.com</p>
-    <p>Follow us on social media: <a href="#">Facebook</a> | <a href="#">Twitter</a></p>
+    <p>Follow us on social media: <a href="/nano">Facebook</a> | <a href="/nano">Twitter</a></p>
   </div>
 
 </body>
